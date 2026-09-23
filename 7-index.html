@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Student MVC</title>
+<style>body{font-family:Arial;max-width:850px;margin:40px auto;padding:20px;background:#f4f7fb}.card{background:white;padding:22px;margin:18px 0;border-radius:14px;box-shadow:0 5px 20px #0001}input,button{padding:11px;margin:5px;border-radius:7px;border:1px solid #ccc}button{background:#2563eb;color:white;border:0}.student{padding:12px;border-bottom:1px solid #ddd}.delete{background:#dc2626}pre{background:#111827;color:white;padding:18px;border-radius:10px;overflow:auto}</style></head>
+<body><h1>🎓 Student Management System</h1>
+<div class="card"><h2>MVC Architecture</h2><pre>USER
+ ↓
+VIEW → index.html
+ ↓
+CONTROLLER → StudentController
+ ↓
+SERVICE → StudentService
+ ↓
+REPOSITORY → StudentRepository
+ ↓
+DATABASE → MySQL</pre></div>
+<div class="card"><h2>Add Student</h2><form id="studentForm"><input id="name" placeholder="Name" required><input id="email" type="email" placeholder="Email" required><input id="course" placeholder="Course" required><button>Add Student</button></form><p id="message"></p></div>
+<div class="card"><h2>Students</h2><div id="studentList"></div></div>
+<script>
+const API='http://localhost:8080/api/students';
+async function loadStudents(){try{const r=await fetch(API);const a=await r.json();const l=document.getElementById('studentList');l.innerHTML=a.length?'':'<p>No students found.</p>';a.forEach(s=>{l.innerHTML+=`<div class="student"><b>${s.name}</b><br>${s.email}<br>${s.course}<br><button class="delete" onclick="deleteStudent(${s.id})">Delete</button></div>`})}catch(e){document.getElementById('message').textContent='Start Spring Boot backend first.'}}
+document.getElementById('studentForm').addEventListener('submit',async e=>{e.preventDefault();const s={name:name.value,email:email.value,course:course.value};await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(s)});e.target.reset();loadStudents()});
+async function deleteStudent(id){await fetch(API+'/'+id,{method:'DELETE'});loadStudents()}loadStudents();
+</script></body></html>
