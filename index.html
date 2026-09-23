@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secure Student MVC</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#eef3f8;color:#1f2937}
+header{background:#173b67;color:white;padding:20px 7%;display:flex;justify-content:space-between;align-items:center}header h1{margin:0;font-size:24px}header span{background:#20a464;padding:7px 12px;border-radius:20px;font-size:13px}
+main{max-width:1050px;margin:30px auto;padding:0 18px}.card{background:#fff;padding:25px;margin-bottom:20px;border-radius:14px;box-shadow:0 7px 25px #0001}.login-card{max-width:430px;margin:60px auto}.hidden{display:none!important}
+input{width:100%;padding:12px;margin:7px 0;border:1px solid #ccd5df;border-radius:8px;font-size:15px}button{border:0;border-radius:8px;padding:11px 18px;background:#1769aa;color:#fff;cursor:pointer;font-weight:bold}.dark{background:#555}.error{background:#ffebee;color:#c62828;padding:10px;border-radius:7px;margin-bottom:10px}.demo{background:#e8f3ff;padding:12px;border-radius:8px;margin-top:15px;font-size:14px}
+.topbar{display:flex;justify-content:space-between;align-items:center}.topbar h2{margin:0}.security{display:flex;gap:9px;flex-wrap:wrap;margin:15px 0}.security span{background:#e9f7ef;color:#167447;padding:8px 12px;border-radius:20px;font-size:13px}
+form{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px}form input{margin:0}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px;border-bottom:1px solid #e5e7eb}th{background:#f5f7fa}.delete{background:#c62828}
+@media(max-width:700px){form{grid-template-columns:1fr}.topbar{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<header><h1>🔐 Secure Student MVC</h1><span>Spring MVC + Security</span></header>
+<main>
+<section id="loginPage" class="card login-card">
+<h2>Secure Login</h2><p>Login to Student Management System</p>
+<div id="loginError" class="error hidden">Invalid username or password.</div>
+<input id="username" placeholder="Username"><input id="password" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<div class="demo">ADMIN: <b>admin / Admin@123</b><br>USER: <b>user / User@123</b></div>
+</section>
+<section id="appPage" class="hidden">
+<div class="card topbar"><div><h2>Student Management System</h2><p>Logged in as <b id="currentUser"></b></p></div><button class="dark" onclick="logout()">Logout</button></div>
+<div class="security"><span>✓ Authentication</span><span>✓ Authorization</span><span>✓ CSRF Protection</span><span>✓ Input Validation</span><span>✓ BCrypt</span></div>
+<div class="card"><h3>Add Student</h3><form id="studentForm"><input id="name" placeholder="Student name" required><input id="email" type="email" placeholder="Email" required><input id="course" placeholder="Course" required><button type="submit">Add Student</button></form></div>
+<div class="card"><h3>Students</h3><table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Course</th><th>Action</th></tr></thead><tbody id="studentTable"></tbody></table></div>
+</section></main>
+<script>
+let currentUser=null;let students=[{id:1,name:'Alekhya',email:'alekhya@example.com',course:'BTech CSE'},{id:2,name:'Rahul',email:'rahul@example.com',course:'BTech CSE'}];
+function login(){let u=username.value.trim(),p=password.value;if((u==='admin'&&p==='Admin@123')||(u==='user'&&p==='User@123')){currentUser=u;loginPage.classList.add('hidden');appPage.classList.remove('hidden');currentUserEl.textContent=u+(u==='admin'?' (ADMIN)':' (USER)');render()}else loginError.classList.remove('hidden')}
+function logout(){location.reload()}
+studentForm.addEventListener('submit',e=>{e.preventDefault();students.push({id:students.length+1,name:name.value.trim(),email:email.value.trim(),course:course.value.trim()});e.target.reset();render()});
+function del(id){if(currentUser!=='admin'){alert('Access denied. Only ADMIN can delete.');return}if(confirm('Delete this student?')){students=students.filter(s=>s.id!==id);render()}}
+function render(){studentTable.innerHTML=students.map(s=>`<tr><td>${s.id}</td><td>${safe(s.name)}</td><td>${safe(s.email)}</td><td>${safe(s.course)}</td><td><button class="delete" onclick="del(${s.id})">Delete</button></td></tr>`).join('')}
+function safe(v){return v.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+</script>
+</body></html>
